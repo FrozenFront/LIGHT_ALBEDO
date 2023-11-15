@@ -1,0 +1,38 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import imageio
+from cycler import cycler
+
+def readIntensity(photoName, plotName, lamp, surface):
+    photo = imageio.imread(photoName)
+    background = photo[320:500, 350:600, 0:3].swapaxes(0, 1)
+
+    cut = photo[320:500, 350:600, 0:3].swapaxes(0, 1)
+    rgb = np.mean(cut, axis=(0))
+    luma = 0.2989 * rgb[:, 0] + 0.5866 * rgb[:, 1] + 0.1144 * rgb[:, 2]
+
+    plt.rc('axes', prop_cycle=(cycler('color', ['r', 'g', 'b'])))
+
+    # Create subplots
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 10), dpi=200)
+
+    # Plot image in the first subplot
+    ax1.imshow(background, origin='lower')
+
+    # Plot intensity in the second subplot
+    ax2.set_title('Интенсивность отражённого излучения\n' + '{} / {}'.format(lamp, surface))
+    ax2.set_xlabel('Относительный номер пикселя')
+    ax2.set_ylabel('Яркость')
+
+    # Plot each color channel separately
+    ax2.plot(rgb[:, 0], label='r')
+    ax2.plot(rgb[:, 1], label='g')
+    ax2.plot(rgb[:, 2], label='b')
+    ax2.plot(luma, 'w', label='I')
+    ax2.legend()
+
+    # Adjust layout to prevent overlap
+    plt.tight_layout()
+
+    # Show the plot
+    plt.show()
